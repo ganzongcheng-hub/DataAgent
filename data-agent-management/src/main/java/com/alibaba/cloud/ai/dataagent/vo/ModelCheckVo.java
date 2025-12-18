@@ -13,41 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.alibaba.cloud.ai.dataagent.common.enums;
 
-import java.util.Optional;
+package com.alibaba.cloud.ai.dataagent.vo;
 
-public enum DatabaseDialectEnum {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-	MYSQL("MySQL"),
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+public class ModelCheckVo {
 
-	SQLite("SQLite"),
+	boolean chatModelReady;
 
-	POSTGRESQL("PostgreSQL"),
+	boolean embeddingModelReady;
 
-	H2("H2"),
-
-	DAMENG("Dameng"),
-
-	SQL_SERVER("SqlServer");
-
-	public final String code;
-
-	DatabaseDialectEnum(String code) {
-		this.code = code;
-	}
-
-	public String getCode() {
-		return code;
-	}
-
-	public static Optional<DatabaseDialectEnum> getByCode(String code) {
-		for (DatabaseDialectEnum value : values()) {
-			if (value.code.equals(code)) {
-				return Optional.of(value);
-			}
-		}
-		return Optional.empty();
-	}
+	boolean ready;
 
 }
