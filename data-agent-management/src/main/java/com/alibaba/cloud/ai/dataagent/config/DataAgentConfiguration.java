@@ -16,8 +16,11 @@
 
 package com.alibaba.cloud.ai.dataagent.config;
 
-import com.alibaba.cloud.ai.dataagent.common.util.McpServerToolUtil;
-import com.alibaba.cloud.ai.dataagent.common.util.NodeBeanUtil;
+import com.alibaba.cloud.ai.dataagent.properties.CodeExecutorProperties;
+import com.alibaba.cloud.ai.dataagent.properties.DataAgentProperties;
+import com.alibaba.cloud.ai.dataagent.properties.FileStorageProperties;
+import com.alibaba.cloud.ai.dataagent.util.McpServerToolUtil;
+import com.alibaba.cloud.ai.dataagent.util.NodeBeanUtil;
 import com.alibaba.cloud.ai.dataagent.service.aimodelconfig.AiModelRegistry;
 import com.alibaba.cloud.ai.dataagent.strategy.EnhancedTokenCountBatchingStrategy;
 import com.alibaba.cloud.ai.dataagent.workflow.dispatcher.*;
@@ -64,7 +67,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.alibaba.cloud.ai.dataagent.common.constant.Constant.*;
+import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 import static com.alibaba.cloud.ai.graph.StateGraph.START;
 import static com.alibaba.cloud.ai.graph.action.AsyncEdgeAction.edge_async;
@@ -133,6 +136,7 @@ public class DataAgentConfiguration implements DisposableBean {
 			keyStrategyHashMap.put(TABLE_RELATION_OUTPUT, KeyStrategy.REPLACE);
 			keyStrategyHashMap.put(TABLE_RELATION_EXCEPTION_OUTPUT, KeyStrategy.REPLACE);
 			keyStrategyHashMap.put(TABLE_RELATION_RETRY_COUNT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(DB_DIALECT_TYPE, KeyStrategy.REPLACE);
 			// Feasibility Assessment 节点输出
 			keyStrategyHashMap.put(FEASIBILITY_ASSESSMENT_NODE_OUTPUT, KeyStrategy.REPLACE);
 			// sql generate节点输出
@@ -164,6 +168,7 @@ public class DataAgentConfiguration implements DisposableBean {
 			keyStrategyHashMap.put(IS_ONLY_NL2SQL, KeyStrategy.REPLACE);
 			// Human Review keys
 			keyStrategyHashMap.put(HUMAN_REVIEW_ENABLED, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(HUMAN_FEEDBACK_DATA, KeyStrategy.REPLACE);
 			// Final result
 			keyStrategyHashMap.put(RESULT, KeyStrategy.REPLACE);
 			return keyStrategyHashMap;

@@ -16,11 +16,13 @@
 
 package com.alibaba.cloud.ai.dataagent.workflow.node;
 
-import com.alibaba.cloud.ai.dataagent.common.enums.TextType;
-import com.alibaba.cloud.ai.dataagent.common.util.ChatResponseUtil;
-import com.alibaba.cloud.ai.dataagent.common.util.FluxUtil;
-import com.alibaba.cloud.ai.dataagent.common.util.StateUtil;
-import com.alibaba.cloud.ai.dataagent.config.DataAgentProperties;
+import com.alibaba.cloud.ai.dataagent.dto.planner.ExecutionStep;
+import com.alibaba.cloud.ai.dataagent.enums.TextType;
+import com.alibaba.cloud.ai.dataagent.util.ChatResponseUtil;
+import com.alibaba.cloud.ai.dataagent.util.FluxUtil;
+import com.alibaba.cloud.ai.dataagent.util.PlanProcessUtil;
+import com.alibaba.cloud.ai.dataagent.util.StateUtil;
+import com.alibaba.cloud.ai.dataagent.properties.DataAgentProperties;
 import com.alibaba.cloud.ai.dataagent.dto.datasource.SqlRetryDto;
 import com.alibaba.cloud.ai.dataagent.dto.prompt.SqlGenerationDTO;
 import com.alibaba.cloud.ai.dataagent.dto.schema.SchemaDTO;
@@ -39,8 +41,8 @@ import reactor.core.publisher.Flux;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.alibaba.cloud.ai.dataagent.common.constant.Constant.*;
-import static com.alibaba.cloud.ai.dataagent.common.util.PlanProcessUtil.getCurrentExecutionStepInstruction;
+import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
+import static com.alibaba.cloud.ai.dataagent.util.PlanProcessUtil.getCurrentExecutionStepInstruction;
 
 /**
  * Enhanced SQL generation node that handles SQL query regeneration with advanced
@@ -66,8 +68,17 @@ public class SqlGenerateNode implements NodeAction {
 		// 判断是否达到最大尝试次数
 		int count = state.value(SQL_GENERATE_COUNT, 0);
 		if (count >= properties.getMaxSqlRetryCount()) {
-			log.error("SQL generation failed after {} attempts, giving up", count);
-			return Map.of(SQL_GENERATE_OUTPUT, StateGraph.END);
+			ExecutionStep executionStep = PlanProcessUtil.getCurrentExecutionStep(state);
+			String sqlGenerateOutput = String.format("步骤[%d]中，SQL次数生成超限，最大尝试次数：%d，已尝试次数:%d，该步骤内容: \n %s",
+					executionStep.getStep(), properties.getMaxSqlRetryCount(), count,
+					executionStep.getToolParameters().getInstruction());
+			log.error("SQL generation failed, reason: {}", sqlGenerateOutput);
+			Flux<ChatResponse> preFlux = Flux.just(ChatResponseUtil.createResponse(sqlGenerateOutput));
+			Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(
+					this.getClass(), state, "正在进行重试评估...", "重试评估完成！",
+					retryOutput -> Map.of(SQL_GENERATE_OUTPUT, StateGraph.END, SQL_GENERATE_COUNT, 0), preFlux);
+			// reset the sql generate count
+			return Map.of(SQL_GENERATE_OUTPUT, generator);
 		}
 
 		// 获取planner分配的当前执行步骤的sql任务要求，每个步骤的sql任务是不同的。
