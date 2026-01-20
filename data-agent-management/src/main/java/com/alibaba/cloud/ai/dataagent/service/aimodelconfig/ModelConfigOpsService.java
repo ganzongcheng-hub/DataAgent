@@ -1,12 +1,11 @@
-
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * https://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -29,6 +28,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import reactor.core.publisher.Flux;
 
 @Slf4j
 @Service
@@ -142,7 +142,10 @@ public class ModelConfigOpsService {
 		String promptText = "Hello";
 
 		// 3. 调用
-		String response = tempModel.call(promptText);
+		Flux<String> responseFlux = tempModel.stream(promptText);
+		String response = responseFlux.collect(StringBuilder::new, StringBuilder::append)
+			.map(StringBuilder::toString)
+			.block();
 
 		// 4. 校验结果
 		if (!StringUtils.hasText(response)) {

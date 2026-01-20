@@ -1,4 +1,5 @@
 <div align="center">
+  <p>中文 | <a href="./README-en.md">English</a></p>
   <h1>Spring AI Alibaba DataAgent</h1>
   <p>
     <strong>基于 <a href="https://github.com/alibaba/spring-ai-alibaba" target="_blank">Spring AI Alibaba</a> 的企业级智能数据分析师</strong>
@@ -97,7 +98,7 @@ npm install && npm run dev
 
 ## 🤝 加入社区 & 贡献
 
-- **钉钉交流群**: `154405001431` ("DataAgent用户1群")
+- **钉钉交流群**: `154405001431` ("DataAgent用户1群") 部分用户可能因为账号安全问题无法加入，条件允许的情况下可换账号申请。
 - **贡献指南**: 欢迎社区贡献！请查阅 [开发者文档](docs/DEVELOPER_GUIDE.md) 了解如何提交 PR。
 
 ## 📄 许可证
